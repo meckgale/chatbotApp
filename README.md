@@ -1,4 +1,4 @@
-#Chatbot
+# ChatBot
 
 A chatbot applciation created using ExpressJS, ReactJS and MongoDB. 
 
