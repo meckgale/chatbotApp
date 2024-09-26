@@ -1,6 +1,6 @@
 # ChatBot
 
-A chatbot applciation created using ExpressJS, ReactJS and MongoDB. 
+A chatbot application created using ExpressJS, ReactJS and MongoDB. 
 
 The session stores 10 predefined questions along with the user's answers to each question
 
