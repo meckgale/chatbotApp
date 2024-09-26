@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { jwtDecode } from "jwt-decode";
 import "./App.css";
 
 function App() {
@@ -52,6 +53,8 @@ function App() {
   const handleNext = async () => {
     // Send the user's answer to the backend before moving to the next question
     if (sessionToken && userAnswer) {
+      const decodedToken = jwtDecode(sessionToken); // Decode token to extract sessionId
+      const sessionId = decodedToken.sessionId;
       try {
         const response = await fetch(
           "http://localhost:8000/api/submit-answer",
@@ -62,7 +65,7 @@ function App() {
               Authorization: `Bearer ${sessionToken}`,
             },
             body: JSON.stringify({
-              sessionId: sessionToken,
+              sessionId: sessionId,
               question: questions[currentQuestionIndex],
               answer: userAnswer,
             }),

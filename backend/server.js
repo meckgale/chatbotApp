@@ -67,6 +67,17 @@ app.post("/api/submit-answer", authMiddleware, async (req, res) => {
       return res.status(404).json({ error: "Session not found" });
     }
 
+    // Check if all questions have been answered
+    const allAnswered = session.questionsAndAnswers.every(
+      (qa) => qa.answer !== ""
+    );
+
+    // If all questions are answered, set the end time
+    if (allAnswered) {
+      session.endTime = Date.now();
+      await session.save(); // Save the updated session with end time
+    }
+
     res.json({ message: "Answer saved successfully", session });
   } catch (error) {
     console.error(error);
