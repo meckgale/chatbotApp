@@ -41,11 +41,37 @@ app.post("/api/start-session", async (req, res) => {
 
   const token = generateToken(session.sessionId);
 
-  return res.json({ token, sessionId: session.sessionId, questions });
+  return res.json({
+    token,
+    sessionId: session.sessionId,
+    questions: session.questionsAndAnswers.map((qa) => qa.question),
+  });
 });
 
-app.use("/api/protected-route", authMiddleware, (req, res) => {
-  return res.json({ message: "Access granted", sessionId: req.sessionId });
+app.post("/api/submit-answer", authMiddleware, async (req, res) => {
+  const { sessionId, question, answer } = req.body;
+
+  if (!sessionId || !question || !answer) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    // Find the session by sessionId and update the question's answer
+    const session = await Session.findOneAndUpdate(
+      { sessionId, "questionsAndAnswers.question": question },
+      { $set: { "questionsAndAnswers.$.answer": answer } }, // Update the answer for the specific question
+      { new: true } // Return the updated session
+    );
+
+    if (!session) {
+      return res.status(404).json({ error: "Session not found" });
+    }
+
+    res.json({ message: "Answer saved successfully", session });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to save answer" });
+  }
 });
 
 const PORT = process.env.PORT || 8000;
